@@ -1,0 +1,294 @@
+✅ 25 Comandos de Enumeração para CMD1️⃣ Ver o nome do usuário atual
+c
+Copiar
+Editar
+whoami
+Mostra o nome de usuário no contexto atual.
+
+2️⃣ Ver os grupos que o usuário atual pertence
+cmd
+Copiar
+Editar
+whoami /groups
+Identifica se o usuário pertence a grupos privilegiados (ex: Administradores, Backup Operators).
+
+3️⃣ Ver os privilégios do token de segurança
+cmd
+Copiar
+Editar
+whoami /priv
+Mostra quais privilégios o usuário possui (ex: SeDebugPrivilege, etc).
+
+4️⃣ Testar se o usuário tem privilégio de administrador
+cmd
+Copiar
+Editar
+net session
+Se você não for admin, esse comando retorna “Acesso negado”.
+
+5️⃣ Listar todos os usuários locais do sistema
+cmd
+Copiar
+Editar
+net user
+6️⃣ Listar os membros do grupo de administradores
+cmd
+Copiar
+Editar
+net localgroup administrators
+7️⃣ Ver configuração do UAC (controle de conta de usuário)
+cmd
+Copiar
+Editar
+reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+8️⃣ Listar serviços configurados para iniciar automaticamente
+cmd
+Copiar
+Editar
+sc query type= service state= all
+9️⃣ Ver detalhes de todos os serviços (nome, caminho, conta)
+cmd
+Copiar
+Editar
+wmic service get name,displayname,pathname,startmode
+🔟 Ver tarefas agendadas
+cmd
+Copiar
+Editar
+schtasks /query /fo LIST /v
+1️⃣1️⃣ Ver conexões de rede ativas com PID
+c
+Copiar
+Editar
+netstat -ano
+1️⃣2️⃣ Ver interfaces de rede com IP, Gateway e DNS
+cmd
+Copiar
+Editar
+ipconfig /all
+1️⃣3️⃣ Mostrar interfaces de Wi-Fi ativas
+cmd
+Copiar
+Editar
+netsh wlan show interfaces
+1️⃣4️⃣ Listar redes Wi-Fi salvas no sistema
+cmd
+Copiar
+Editar
+netsh wlan show profiles
+1️⃣5️⃣ Listar rotas de rede configuradas
+cmd
+Copiar
+Editar
+route print
+1️⃣6️⃣ Ver histórico de comandos (se cmd foi usado interativamente)
+cmd
+Copiar
+Editar
+doskey /history
+1️⃣7️⃣ Listar variáveis de ambiente
+c
+Copiar
+Editar
+set
+1️⃣8️⃣ Ver drives/unidades conectadas
+cmd
+Copiar
+Editar
+wmic logicaldisk get name,description
+1️⃣9️⃣ Ver unidades de rede mapeadas
+cmd
+Copiar
+Editar
+net use
+2️⃣0️⃣ Ver programas instalados
+cmd
+Copiar
+Editar
+wmic product get name,version
+2️⃣1️⃣ Buscar arquivos .bat, .cmd e .ps1 no sistema
+cmd
+Copiar
+Editar
+dir C:\*.bat /s /b
+2️⃣2️⃣ Buscar arquivos que contenham senhas
+cmd
+Copiar
+Editar
+findstr /si "password senha pwd pass" C:\*.*
+2️⃣3️⃣ Ver se usuário pode escrever na pasta Program Files (risco de LPE)
+cmd
+Copiar
+Editar
+icacls "C:\Program Files"
+2️⃣4️⃣ Ver permissões em System32 (ver se "Users" tem acesso indevido)
+cmd
+Copiar
+Editar
+icacls "C:\Windows\System32"
+2️⃣5️⃣ Listar serviços que rodam como SYSTEM
+cmd
+Copiar
+Editar
+sc query | findstr "SERVICE_NAME" && sc qc <nome_do_serviço>
+Combine com: wmic service get name,startname | find "LocalSystem"
+
+Se quiser, posso montar esses comandos em um batch script .bat com pausas, salvando tudo em .txt.
+
+Quer?
+
+
+
+
+
+
+Dito por si:
+os mesmos comandos que estavam no loop
+
+
+Dito pelo ChatGPT:
+Fechou! Aqui estão os 25 comandos que estavam no menu interativo PowerShell, agora convertidos para uso direto no CMD (Prompt de Comando), com explicações linha por linha.
+
+⚠️ Alguns comandos não existem nativamente no CMD, então adaptei para o mais próximo equivalente.
+
+✅ 25 Comandos do Menu (para CMD)
+1️⃣ Mostrar usuário atual
+cmd
+Copiar
+Editar
+whoami
+2️⃣ Mostrar grupos do usuário atual
+cmd
+Copiar
+Editar
+whoami /groups
+3️⃣ Mostrar privilégios do token do usuário atual
+cmd
+Copiar
+Editar
+whoami /priv
+4️⃣ Verificar se o usuário tem acesso de administrador
+cmd
+Copiar
+Editar
+net session
+Se der "Acesso negado", você não é admin.
+
+5️⃣ Listar todos os usuários locais
+cmd
+Copiar
+Editar
+net user
+6️⃣ Listar membros do grupo Administradores
+cmd
+Copiar
+Editar
+net localgroup administrators
+7️⃣ Ver configurações do UAC
+cmd
+Copiar
+Editar
+reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+8️⃣ Listar serviços automáticos
+cmd
+Copiar
+Editar
+wmic service get name,displayname,pathname,startmode | findstr /i "auto"
+9️⃣ Listar serviços com caminhos potencialmente editáveis
+cmd
+Copiar
+Editar
+wmic service get name,startname,pathname | findstr /i " "
+Caminhos com espaço sem aspas são candidatos a exploração.
+
+🔟 Listar tarefas agendadas detalhadamente
+cmd
+Copiar
+Editar
+schtasks /query /fo LIST /v
+1️⃣1️⃣ Buscar arquivos .exe no disco C
+cmd
+Copiar
+Editar
+dir C:\*.exe /s /b
+Para verificar permissões, use icacls depois manualmente.
+
+1️⃣2️⃣ Ver permissões em pastas críticas (DLL hijacking)
+cmd
+Copiar
+Editar
+icacls "C:\Program Files"
+icacls "C:\Windows\System32"
+1️⃣3️⃣ Ver permissões no registro (HKLM\Software)
+cmd
+Copiar
+Editar
+reg query HKLM\Software /s
+1️⃣4️⃣ Listar programas instalados
+cmd
+Copiar
+Editar
+wmic product get name,version
+1️⃣5️⃣ Buscar arquivos com possíveis senhas
+cmd
+Copiar
+Editar
+findstr /si "password senha pwd" C:\*.*
+1️⃣6️⃣ Rodar PowerUp (não funciona direto no CMD, apenas PowerShell)
+Use no PowerShell:
+
+powershell
+Copiar
+Editar
+powershell -ep bypass -File .\PowerUp.ps1
+1️⃣7️⃣ Rodar Seatbelt (em CMD, se tiver Seatbelt.exe)
+cmd
+Copiar
+Editar
+Seatbelt.exe all
+1️⃣8️⃣ Listar conexões de rede ativas
+cmd
+Copiar
+Editar
+netstat -ano
+1️⃣9️⃣ Listar variáveis de ambiente
+cmd
+Copiar
+Editar
+set
+2️⃣0️⃣ Ver histórico de comandos (CMD)
+cmd
+Copiar
+Editar
+doskey /history
+2️⃣1️⃣ Listar unidades mapeadas
+c
+Copiar
+Editar
+net use
+2️⃣2️⃣ Ver serviços rodando como SYSTEM
+c
+Copiar
+Editar
+wmic service get name,startname | findstr /i "LocalSystem"
+2️⃣3️⃣ Buscar scripts .bat e .ps1 no disco
+cmd
+Copiar
+Editar
+dir C:\*.bat /s /b
+dir C:\*.ps1 /s /b
+2️⃣4️⃣ Ver se "Users" ou "Everyone" têm acesso em diretórios importantes
+cmd
+Copiar
+Editar
+icacls "C:\Program Files"
+icacls "C:\ProgramData"
+2️⃣5️⃣ Diagnóstico de rede completo
+cmd
+Copiar
+Editar
+ipconfig /all
+netsh wlan show interfaces
+netsh wlan show profiles
+route print
+netstat -ano
