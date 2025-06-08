@@ -1,0 +1,81 @@
+# DLL SACA HACKER v2 – Reconfortificada
+$now = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+$docPath = [Environment]::GetFolderPath("MyDocuments")
+$dumpFile = "$docPath\sysdump_$now.txt"
+
+function Write-Log {
+    param([string]$text)
+    Add-Content -Path $dumpFile -Value "[*] $(Get-Date -Format 'HH:mm:ss') :: $text"
+}
+
+# Identidade do sistema
+Write-Log "Usuário: $(whoami)"
+Write-Log "Hostname: $env:COMPUTERNAME"
+Write-Log "Domínio: $env:USERDOMAIN"
+Write-Log "SID: $((New-Object System.Security.Principal.NTAccount($env:USERNAME)).Translate([System.Security.Principal.SecurityIdentifier]).Value)"
+Write-Log "Arquitetura: $env:PROCESSOR_ARCHITECTURE"
+Write-Log "Tempo ligado: $((Get-CimInstance Win32_OperatingSystem).LastBootUpTime)"
+
+# Info de rede
+Write-Log "IPCONFIG:"
+ipconfig /all | Out-File -Append $dumpFile
+
+Write-Log "Netstat:"
+netstat -ano | Out-File -Append $dumpFile
+
+Write-Log "Tabela ARP:"
+arp -a | Out-File -Append $dumpFile
+
+# Perfis e interfaces
+Write-Log "Perfis Wi-Fi:"
+netsh wlan show profile | Out-File -Append $dumpFile
+
+Write-Log "Interfaces WLAN:"
+netsh wlan show interfaces | Out-File -Append $dumpFile
+
+# Sessões RDP
+Write-Log "Sessões RDP:"
+qwinsta | Out-File -Append $dumpFile
+
+# Verifica antivírus instalado
+Write-Log "Antivírus instalado:"
+Get-CimInstance -Namespace "root\SecurityCenter2" -ClassName AntivirusProduct | ForEach-Object {
+    Write-Log "AV: $($_.displayName) :: Estado: $($_.productState)"
+}
+
+# Discos removíveis conectados
+Write-Log "Dispositivos USB/Mídia Removível:"
+Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq 2 } | ForEach-Object {
+    Write-Log "USB: $($_.DeviceID) - Label: $($_.VolumeName)"
+}
+
+# Usuários e permissões
+Write-Log "Usuários locais:"
+net user | Out-File -Append $dumpFile
+
+Write-Log "Administradores:"
+net localgroup administrators | Out-File -Append $dumpFile
+
+# Arquivos sensíveis
+Write-Log "Arquivos comuns em C:\Users:"
+Get-ChildItem -Path C:\Users -Recurse -ErrorAction SilentlyContinue -Force |
+    Where-Object { !$_.PSIsContainer } |
+    Select-Object -First 200 |
+    ForEach-Object { Add-Content -Path $dumpFile -Value $_.FullName }
+
+# Verifica se é admin
+$identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+$principal = New-Object System.Security.Principal.WindowsPrincipal($identity)
+if ($principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Log "[+] EXECUTANDO COMO ADMIN"
+} else {
+    Write-Log "[-] NÃO ESTÁ COM PRIVILÉGIO DE ADMIN"
+}
+
+# Finalização
+Write-Log "Coleta concluída. Arquivo salvo em: $dumpFile"
+
+# Opcional: compressão
+$zip = "$docPath\sysdump_$now.zip"
+Compress-Archive -Path $dumpFile -DestinationPath $zip -Force
+Write-Log "ZIP criado em: $zip"
