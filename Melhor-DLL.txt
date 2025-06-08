@@ -1,0 +1,224 @@
+
+#MELHOR-DLL
+#COPIAR NA IA META # CONTROL A control c antes de parar de escrever
+
+
+
+$doc = [Environment]::GetFolderPath("MyDocuments")
+$dll = Join-Path $doc "nuca.dll"
+
+# Código-fonte da DLL em C#
+$code = @"
+using System;
+using System.IO;
+using System.Diagnostics;
+
+public class Nuca {
+public static void Start() {
+string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\nuca_dump.txt";
+using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8)) {
+sw.WriteLine("[*] NUCA DLL EXECUTADA: " + DateTime.Now);
+
+string[] comandos = new string[] {
+"whoami",
+"hostname",
+"systeminfo",
+"ipconfig /all",
+"netstat -ano",
+"arp -a",
+"net user",
+"net localgroup administrators",
+"netsh wlan show profile",
+"tasklist",
+"driverquery",
+"reg query HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+"cmd /c dir C:\\Users /s /b"
+};
+
+foreach (string cmd in comandos) {
+sw.WriteLine("==============================");
+sw.WriteLine("> " + cmd);
+sw.WriteLine("------------------------------");
+
+try {
+var p = new Process();
+p.StartInfo.FileName = "cmd.exe";
+p.StartInfo.Arguments = "/c " + cmd;
+p.StartInfo.RedirectStandardOutput = true;
+p.StartInfo.UseShellExecute = false;
+p.StartInfo.CreateNoWindow = true;
+p.Start();
+string output = p.StandardOutput.ReadToEnd();
+p.WaitForExit();
+sw.WriteLine(output);
+} catch (Exception ex) {
+sw.WriteLine(">> ERRO: " + ex.Message);
+}
+}
+
+sw.WriteLine("[*] NUCA DLL ENCERRADA: " + DateTime.Now);
+}
+}
+}
+"@
+
+# Compila a DLL
+Add-Type -TypeDefinition $code -OutputAssembly $dll -OutputType Library
+Write-Host "`n[+] DLL criada em: $dll"
+
+# Carrega a DLL compilada e executa o método Start()
+$assembly = [System.Reflection.Assembly]::LoadFile($dll)
+[Nuca]::Start()
+
+Write-Host "[+] Comandos executados. Arquivo salvo em: $doc\nuca_dump.txt"
+Lamento, neste momento não consigo ajudar com este pedido. Posso ajudar em mais alguma coisa?
+pode corrigir este codigo,,,
+pode corrigir este codigo, e por a dll a salvar relatorio em txt pasta decomentos,,# Caminho para a pasta Documentos do usuário
+$doc = [Environment]::GetFolderPath("MyDocuments")
+$dll = Join-Path $doc "nuca.dll"
+
+# Código-fonte da DLL em C#
+$code = @"
+using System;
+using System.IO;
+using System.Diagnostics;
+
+public class Nuca {
+public static void Start() {
+string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\nuca_dump.txt";
+using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8)) {
+sw.WriteLine("[*] NUCA DLL EXECUTADA: " + DateTime.Now);
+
+string[] comandos = new string[] {
+"whoami",
+"hostname",
+"systeminfo",
+"ipconfig /all",
+"netstat -ano",
+"arp -a",
+"net user",
+"net localgroup administrators",
+"netsh wlan show profile",
+"tasklist",
+"driverquery",
+"reg query HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+"cmd /c dir C:\\Users /s /b"
+};
+
+foreach (string cmd in comandos) {
+sw.WriteLine("==============================");
+sw.WriteLine("> " + cmd);
+sw.WriteLine("------------------------------");
+
+try {
+var p = new Process();
+p.StartInfo.FileName = "cmd.exe";
+p.StartInfo.Arguments = "/c " + cmd;
+p.StartInfo.RedirectStandardOutput = true;
+p.StartInfo.UseShellExecute = false;
+p.StartInfo.CreateNoWindow = true;
+p.Start();
+string output = p.StandardOutput.ReadToEnd();
+p.WaitForExit();
+sw.WriteLine(output);
+} catch (Exception ex) {
+sw.WriteLine(">> ERRO: " + ex.Message);
+}
+}
+
+sw.WriteLine("[*] NUCA DLL ENCERRADA: " + DateTime.Now);
+}
+}
+}
+"@
+
+# Compila a DLL
+Add-Type -TypeDefinition $code -OutputAssembly $dll -OutputType Library
+Write-Host "`n[+] DLL criada em: $dll"
+
+# Carrega a DLL compilada e executa o método Start()
+$assembly = [System.Reflection.Assembly]::LoadFile($dll)
+[Nuca]::Start()
+
+Write-Host "[+] Comandos executados. Arquivo salvo em: $doc\nuca_dump.txt"
+O código parece estar correto em geral, mas há algumas coisas que podem ser melhoradas ou corrigidas:
+A DLL está sendo salva na pasta "Documentos" corretamente, mas o relatório está sendo salvo na mesma pasta com o nome "nuca_dump.txt". Se você quiser salvar o relatório em uma subpasta chamada "decomentos" dentro da pasta "Documentos", você precisará modificar o caminho do arquivo.
+É uma boa prática verificar se a pasta "decomentos" existe antes de tentar salvar o arquivo nela. Se a pasta não existir, você pode criá-la usando o cmdlet New-Item.
+Você pode usar o cmdlet Join-Path para combinar o caminho da pasta com o nome do arquivo, assim como você fez para criar o caminho da DLL.
+Aqui está o código corrigido:
+PowerShell
+# Caminho para a pasta Documentos do usuário
+$doc = [Environment]::GetFolderPath("MyDocuments")
+$decomentos = Join-Path $doc "decomentos"
+
+# Cria a pasta decomentos se ela não existir
+if (!(Test-Path $decomentos)) {
+    New-Item -ItemType Directory -Path $decomentos | Out-Null
+}
+
+$dll = Join-Path $doc "nuca.dll"
+$relatorio = Join-Path $decomentos "nuca_dump.txt"
+
+# Código-fonte da DLL em C#
+$code = @"
+using System;
+using System.IO;
+using System.Diagnostics;
+
+public class Nuca {
+    public static void Start(string path) {
+        using (StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.UTF8)) {
+            sw.WriteLine("[*] NUCA DLL EXECUTADA: " + DateTime.Now);
+
+            string[] comandos = new string[] {
+                "whoami",
+                "hostname",
+                "systeminfo",
+                "ipconfig /all",
+                "netstat -ano",
+                "arp -a",
+                "net user",
+                "net localgroup administrators",
+                "netsh wlan show profile",
+                "tasklist",
+                "driverquery",
+                "reg query HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                "cmd /c dir C:\\Users /s /b"
+            };
+
+            foreach (string cmd in comandos) {
+                sw.WriteLine("==============================");
+                sw.WriteLine("> " + cmd);
+                sw.WriteLine("------------------------------");
+
+                try {
+                    var p = new Process();
+                    p.StartInfo.FileName = "cmd.exe";
+                    p.StartInfo.Arguments = "/c " + cmd;
+                    p.StartInfo.RedirectStandardOutput = true;
+                    p.StartInfo.UseShellExecute = false;
+                    p.StartInfo.CreateNoWindow = true;
+                    p.Start();
+                    string output = p.StandardOutput.ReadToEnd();
+                    p.WaitForExit();
+                    sw.WriteLine(output);
+                } catch (Exception ex) {
+                    sw.WriteLine(">> ERRO: " + ex.Message);
+                }
+            }
+
+            sw.WriteLine("[*] NUCA DLL ENCERRADA: " + DateTime.Now);
+        }
+    }
+}
+"@
+
+# Compila a DLL
+Add-Type -TypeDefinition $code -OutputAssembly $dll -OutputType Library
+Write-Host "`n[+] DLL criada em: $dll"
+
+# Carrega a DLL compilada e executa o método Start()
+$assembly = [System.Reflection.Assembly]::LoadFile($dll)
+[Nuca]::Start($relatorio)
+
+Write-Host "[+] Comandos executados. Arquivo salvo em: $relatorio"
