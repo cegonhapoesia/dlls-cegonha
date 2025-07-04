@@ -1,0 +1,24 @@
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; object-src 'none';">
+<title>PenTest Database Search</title>
+
+<HTA:APPLICATION 
+    ID="PenTestApp"
+    APPLICATIONNAME="PenTest Database Search"
+    BORDER="thin"
+    BORDERSTYLE="normal"
+    CAPTION="yes"
+    SHOWINTASKBAR="yes"
+    SINGLEINSTANCE="yes"
+    SYSMENU="yes"
+>
+<script>
+function authenticate(user, pass) {
+    // Compare com hash armazenado, nunca texto claro
+    if (hash(user) === storedUserHash && hash(pass) === storedPassHash) {
+        return true;
+    }
+    return false;
+}
+
+</script>
