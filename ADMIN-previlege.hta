@@ -1,0 +1,22 @@
+<html>
+<head>
+  <title>HTA com Elevação</title>
+  <HTA:APPLICATION ID="elevado" 
+    APPLICATIONNAME="ElevadorHTA"
+    BORDER="thin"
+    SHOWINTASKBAR="yes"
+    SINGLEINSTANCE="yes"
+    WINDOWSTATE="normal">
+</head>
+<script language="VBScript">
+Sub Elevar
+  Set shell = CreateObject("Shell.Application")
+  shell.ShellExecute "cmd.exe", "/c msg * Executando com privilégios elevados!", "", "runas", 1
+End Sub
+</script>
+
+<body>
+  <h2>Solicitar Privilégios de Administrador</h2>
+  <input type="button" value="Executar como ADMIN" onclick="Elevar">
+</body>
+</html>
