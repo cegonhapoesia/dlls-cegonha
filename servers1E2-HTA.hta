@@ -1,0 +1,165 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>Servidor HTA</title>
+<HTA:APPLICATION 
+  ID="ServidorHTA"
+  APPLICATIONNAME="ServidorHTA"
+  BORDER="thin"
+  CAPTION="yes"
+  SHOWINTASKBAR="yes"
+  SINGLEINSTANCE="yes"
+  SYSMENU="yes"
+/>
+
+<script language="VBScript">
+Dim server
+
+Sub Window_OnLoad()
+    Set server = CreateObject("MSWinsock.Winsock")
+    server.LocalPort = 8080
+    On Error Resume Next
+    server.Listen
+
+    If Err.Number = 0 Then
+        MsgBox "Servidor ativo na porta 8080"
+    Else
+        MsgBox "Erro ao iniciar servidor: " & Err.Description
+    End If
+End Sub
+
+Sub server_ConnectionRequest(ByVal requestID)
+    If server.State <> 0 Then server.Close
+    server.Accept requestID
+End Sub
+
+Sub server_DataArrival(ByVal bytesTotal)
+    Dim requestData
+    server.GetData requestData, 2 ' 2 = String
+
+    Dim resposta
+    resposta = "HTTP/1.1 200 OK" & vbCrLf & _
+               "Content-Type: text/plain" & vbCrLf & _
+               "Content-Length: 17" & vbCrLf & vbCrLf & _
+               "Resposta do Servidor"
+
+    server.SendData resposta
+    server.Close
+    server.Listen
+End Sub
+</script>
+</head>
+<h1>servidor enviador 1 </h1>
+<body>
+<h3>Pesquisa Universal</h3>
+<input type="text" id="pesquisa" size="50" placeholder="Digite o que deseja pesquisar..." />
+<br><br>
+<input type="button" value="Pesquisar no Google" onclick="pesquisar 'google'" />
+<input type="button" value="Pesquisar no Bing" onclick="pesquisar 'bing'" />
+
+<script language="VBScript">
+Sub pesquisar(motor)
+    Dim termo, url
+
+    termo = document.getElementById("pesquisa").value
+
+    If termo = "" Then
+        MsgBox "Digite algo para pesquisar."
+        Exit Sub
+    End If
+
+    If motor = "google" Then
+        url = "https://www.google.com/search?q=" & Replace(termo, " ", "+")
+    ElseIf motor = "bing" Then
+        url = "https://www.bing.com/search?q=" & Replace(termo, " ", "+")
+    Else
+        MsgBox "Motor de busca não reconhecido."
+        Exit Sub
+    End If
+
+    ' Abre a URL no navegador padrão
+    CreateObject("WScript.Shell").Run url
+End Sub
+</script>
+
+<h2>Servidor HTA Ativo</h2>
+<p>Aguardando conexões na porta 8080...</p>
+</body>
+</html>
+
+
+<------------------------------------------------------------------------------------>
+
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cliente HTA</title>
+<HTA:APPLICATION 
+  ID="ClienteHTA"
+  APPLICATIONNAME="ClienteHTA"
+  BORDER="thin"
+  CAPTION="yes"
+  SHOWINTASKBAR="yes"
+  SINGLEINSTANCE="yes"
+  SYSMENU="yes"
+/>
+
+<script language="VBScript">
+Sub Window_OnLoad()
+    Dim http, ip, porta, url
+    ip = "192.168.0.10"  ' <--- Altere para o IP do servidor
+    porta = "8080"
+    url = "http://" & ip & ":" & porta & "/"
+
+    Set http = CreateObject("MSXML2.XMLHTTP")
+
+    On Error Resume Next
+    http.Open "GET", url, False
+    http.Send
+
+    If Err.Number = 0 Then
+        MsgBox "Resposta do servidor: " & http.responseText
+    Else
+        MsgBox "Erro ao conectar: " & Err.Description
+    End If
+End Sub
+</script>
+</head>
+<h1>servidor cliente receptor 2 </h1>
+<body>
+<h3>Pesquisa Universal</h3>
+<input type="text" id="pesquisa" size="50" placeholder="Digite o que deseja pesquisar..." />
+<br><br>
+<input type="button" value="Pesquisar no Google" onclick="pesquisar 'google'" />
+<input type="button" value="Pesquisar no Bing" onclick="pesquisar 'bing'" />
+
+<script language="VBScript">
+Sub pesquisar(motor)
+    Dim termo, url
+
+    termo = document.getElementById("pesquisa").value
+
+    If termo = "" Then
+        MsgBox "Digite algo para pesquisar."
+        Exit Sub
+    End If
+
+    If motor = "google" Then
+        url = "https://www.google.com/search?q=" & Replace(termo, " ", "+")
+    ElseIf motor = "bing" Then
+        url = "https://www.bing.com/search?q=" & Replace(termo, " ", "+")
+    Else
+        MsgBox "Motor de busca não reconhecido."
+        Exit Sub
+    End If
+
+    ' Abre a URL no navegador padrão
+    CreateObject("WScript.Shell").Run url
+End Sub
+</script>
+
+<h2>Cliente HTA</h2>
+<p>Enviando requisição para o servidor...</p>
+</body>
+</html>
+
